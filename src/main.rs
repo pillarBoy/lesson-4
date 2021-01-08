@@ -1,5 +1,6 @@
-use std::{f64::consts::PI, convert::TryInto};
-use std::ops::{Mul};
+use std::{f64::consts::PI, convert::Into};
+use std::ops::{Mul, Add};
+use std::fmt::Display;
 
 
 // 1.1信号灯枚举
@@ -46,40 +47,36 @@ struct Round<T> {
     r: T,
 }
 
-impl<T: TryInto<f64> + Copy + Mul<Output = T>> Summary for Round<T> {
+impl<T: Into<f64> + Copy + Mul<Output = T> + Display> Summary for Round<T> {
     fn summarize(&self) {
         let rr = self.r * self.r;
-        let area = if let Ok(v) = T::try_into::<>(rr){
-            v * PI
-        } else {
-            0.0
-        };
-
+        let area = T::into(rr) * PI;
         println!("{}", area); 
     }
 }
 // 3-2三角形
-struct Triangle {
-    a: f64,
-    b: f64,
-    c: f64,
+struct Triangle<T> {
+    a: T,
+    b: T,
+    c: T,
 }
-impl Summary for Triangle {
+impl<T: Into<f64> + Add<Output = T> + Copy> Summary for Triangle<T> {
     fn summarize(&self) {
-        let p = (self.a + self.b + self.c)/2.0;
-        let area = (p * (p - self.a) * (p - self.b) * (p - self.c)).sqrt();
+        let abc = self.a + self.b + self.c;
+        let p = T::into(abc) / 2.0;
+        let area = (p * (p - T::into(self.a)) * (p - T::into(self.b)) * (p - T::into(self.c))).sqrt();
         println!("{}", area); 
     }
 }
 
 // 3-3矩形
-struct Rect {
-    width: f64,
-    height: f64,
+struct Rect<T> {
+    width: T,
+    height: T,
 }
 
 // 如果给 struct 添加了泛型 那在impl 的时候这个泛型到底怎么处理
-impl Summary for Rect {
+impl<T: Into<f64> + Mul<Output = T> + Copy + Display> Summary for Rect<T> {
     fn summarize(&self)  {
         let area = self.width * self.height;
         println!("{}", area); 
