@@ -1,4 +1,6 @@
-use std::f64::consts::PI;
+use std::{f64::consts::PI, convert::TryInto};
+use std::ops::{Mul};
+
 
 // 1.1信号灯枚举
 enum TrafficLight {
@@ -36,18 +38,24 @@ fn sum(list: &[u32]) -> Option<u32> {
 
 // 求面积函数 Trait
 pub trait Summary {
-    fn summarize(&self) -> String;
+    fn summarize(&self);
 }
 
 // 3-1圆形
-struct Round {
-    r: f64,
+struct Round<T> {
+    r: T,
 }
 
-impl Summary for Round {
-    fn summarize(&self) -> String {
+impl<T: TryInto<f64> + Copy + Mul<Output = T>> Summary for Round<T> {
+    fn summarize(&self) {
         let rr = self.r * self.r;
-        format!("{}", rr * PI)
+        let area = if let Ok(v) = T::try_into::<>(rr){
+            v * PI
+        } else {
+            0.0
+        };
+
+        println!("{}", area); 
     }
 }
 // 3-2三角形
@@ -57,10 +65,10 @@ struct Triangle {
     c: f64,
 }
 impl Summary for Triangle {
-    fn summarize(&self) -> String {
+    fn summarize(&self) {
         let p = (self.a + self.b + self.c)/2.0;
         let area = (p * (p - self.a) * (p - self.b) * (p - self.c)).sqrt();
-        format!("{}", area)
+        println!("{}", area); 
     }
 }
 
@@ -72,15 +80,15 @@ struct Rect {
 
 // 如果给 struct 添加了泛型 那在impl 的时候这个泛型到底怎么处理
 impl Summary for Rect {
-    fn summarize(&self) -> String {
-        format!("{}", self.width * self.height)
+    fn summarize(&self)  {
+        let area = self.width * self.height;
+        println!("{}", area); 
     }
 }
 
 // 打印形状类型的函数
 fn print_shape_area<T: Summary>(shape: T) {
-    let area = shape.summarize();
-    println!("area is {}", area);
+    shape.summarize();
 } 
 
 
