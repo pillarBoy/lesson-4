@@ -44,3 +44,31 @@ Clone 相对与Copy 更慢，因为数据在堆上，堆上的所有数据都需
     // 这里之后不可使用a 变量
 }
 ```
+
+# 泛型(数字类型) 乘 一个指定类型 可以使用  Into 或者 FromeInto 去转换类型然后相乘
+```rust
+use std::convert::Into;
+
+struct Round<T> {
+    r: T
+}
+
+fn my_into<T: Into<f64>>(v: T) -> f64 {
+    T::into(v)
+}
+
+pub const PI: f64 = 3.14159265358979323846264338327950288f64;
+
+fn main() {
+    // 简单使用
+    let value = my_into(3) * 234.0982f64;
+    println!("value is {}", value);
+
+    // 或者
+    let round1 = Round { r: 2 };
+    // 这里转换一下round1.r 的类型
+    let area = my_into(round1.r) * PI;
+    println!("area is {}", area);
+}
+
+```
